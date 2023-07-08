@@ -1,8 +1,23 @@
-# MarkDialogue
+<h1 align="center">MarkDialogue</h1>
+<p align="center">MarkDown to Dialogue system for Unity</p>
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/NovaDawn-Studios/MarkDialogue?color=FFD700)](https://github.com/NovaDawn-Studios/MarkDialogue/stargazers)
-[![GitHub contributors](https://img.shields.io/github/contributors-anon/NovaDawn-Studios/MarkDialogue)
-](https://github.com/NovaDawn-Studios/MarkDialogue/graphs/contributors?color=009a00)
+<p align="center">
+ <a href="https://github.com/NovaDawn-Studios/MarkDialogue/stargazers">
+  <img src="https://img.shields.io/github/stars/NovaDawn-Studios/MarkDialogue?color=FFD700" alt="GitHub Repo Stars" />
+ </a>
+ <a href="https://github.com/NovaDawn-Studios/MarkDialogue/graphs/contributors">
+  <img src="https://img.shields.io/github/contributors-anon/NovaDawn-Studios/MarkDialogue?color=009a00" alt="GitHub Contributors" />
+ </a>
+ <a href="https://github.com/NovaDawn-Studios/MarkDialogue/commits/main">
+  <img src="https://img.shields.io/github/last-commit/NovaDawn-Studios/MarkDialogue" alt="Latest Commit" />
+ </a>
+</p>
+
+----
+
+**_Note: This product isn't ready or usable yet, but the documentation below corresponds with the overall plans of the project. Once it's in a workable state, this message will disappear._**
+
+----
 
 A [MarkDown](https://daringfireball.net/projects/markdown/)-to-dialogue parser for Unity. Write complex narritives in a common, easy to read format using your favourite tools and play them out in-engine!
 
@@ -21,12 +36,18 @@ MarkDialogue uses the Obsidian.md subset of MarkDown which is almost entirely co
 * [Obsidian-style comments](https://help.obsidian.md/Editing+and+formatting/Basic+formatting+syntax#Comments) are also completely ignored outside of counting line numbers. There is one exception to this:
   * Comments as line IDs. These are short strings such at `%% 3TSGXZOL2C %%` will be automatically inserted onto dialogue lines when a script is imported, and is used to allow extra features such as attaching voice dialogue and other external features to a particular line. These comments appear at the end of a line and for all intents and purposes should be ignored, although if the line moves posistion, this comment should go with it. Changing the contents of this comment could break links between assets and their respective line.
 
-* MarkDown script tags are also ignored in the event case you want to force your MarkDown editor use display raw MarkDown without the preview being affected. As a result, you could do the below without affecting how your script works (This is done in the [Examples](https://github.com/NovaDawn-Studios/MarkDialogue/tree/main/Examples) directory to force GitHub to display raw MarkDown):  
+* MarkDown script tags are also ignored in the event that you want to force your MarkDown editor to display raw MarkDown, even in preview mode. As a result, you could do the below without affecting how your script works (This is done in the [Examples](https://github.com/NovaDawn-Studios/MarkDialogue/tree/main/Examples) directory to force GitHub to display raw MarkDown):  
+````md
 ```md
-```md
+JOHN
+Hi there!
+```
 or
 ```markdown
+PETE
+Hello!
 ```
+````
 
 * A word in ALL CAPS at the start of the line indicate the character that's speaking. This must be a single word of Unicode uppercase characters (Matching the regular expression class `\p{Lu}`) consisting of no whitespace, although underscores and hyphens are allowed. This tag represents a single unique character in your scene, and can be used by your game to focus the camera on a particular entity in the world, show a sprite, whatever. The character range l
 
@@ -156,3 +177,7 @@ When installed, MarkDialogue will parse all MarkDown files that end in `.dlg.md`
 Next, you want to apply a MarkDown Player component onto an entity in your scene, add the relevant Script Collection and set the `Script To Run` if required, and finally hook up the associated events. Either that, or inherit from `BaseMarkdownPlayer` and implement your own handling. Then either mark `Auto Start`, or trigger it yourself from your own code, and you'll be good to go!
 
 **_TODO: Provide more details._**
+
+## Contributing
+
+Are we missing a feature? Find a bug? Just want to contribute? Go ahead! Raise issues, create PRs, spread the word. If your code gets added and is used in a NovaDawn Studios game, you'll even appear in the credits (Unless you don't want to be, of course)!

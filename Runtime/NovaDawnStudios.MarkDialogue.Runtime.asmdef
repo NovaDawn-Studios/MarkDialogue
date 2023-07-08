@@ -1,0 +1,14 @@
+{
+    "name": "NovaDawnStudios.MarkDialogue.Runtime",
+    "rootNamespace": "NovaDawnStudios.MarkDialogue",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

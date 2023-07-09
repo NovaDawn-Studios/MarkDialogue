@@ -10,30 +10,25 @@ namespace NovaDawnStudios.MarkDialogue
     [AddComponentMenu("NovaDawn Studios/MarkDialogue/MarkDialogue Player", 182)]
     public class MarkDialoguePlayer : BaseMarkDialoguePlayer
     {
-        /// <inheritdoc/>
-        public override void PlayScript()
+        protected override void OnDialogueStart(MarkDialoguePlayerState state)
         {
-            // TODO: Implement a proper player.
-            // DEV: Debug code
-            if (ScriptCollection == null)
-            {
-                return;
-            }
+            Debug.Log("Starting Dialogue");
+        }
 
-            if (ScriptCollection.Scripts.Count == 0)
-            {
-                Debug.LogError($"Could not run script {ScriptToRun} in collection {ScriptCollection} - The supplied collection has no scripts! Maybe you need to reimport?");
-                return;
-            }
+        protected override void OnDialogueEnd()
+        {
+            Debug.Log("Ending Dialogue");
+        }
 
-            foreach (var script in ScriptCollection.Scripts)
-            {
-                Debug.Log(script.ScriptName);
-                foreach (var line in script.Lines)
-                {
-                    Debug.Log($"{line.type} -> {line.rawLine}");
-                }
-            }
+        protected override void OnDialogueLine(MarkDialogueCharacter character, MarkDialogueLine dialogueLine, WaitForDialogueContinuation continuation)
+        {
+            Debug.Log($"{character.CharacterIdentifier}: {dialogueLine.LineText}");
+            continuation.ContinueDialogue();
+        }
+
+        protected override void OnQuoteText(MarkDialogueLine quoteLine)
+        {
+            Debug.LogWarning($"[Dialogue Comment] {quoteLine}");
         }
     }
 }

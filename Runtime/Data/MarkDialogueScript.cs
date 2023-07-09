@@ -14,25 +14,9 @@ namespace NovaDawnStudios.MarkDialogue.Data
     {
         internal const string DEFAULT_SCRIPT_NAME = "Default Script";
 
-        /// <summary>
-        ///     Matches on a MarkDown heading, capturing the text of the heading and stopping before an Obsidian comment or the end of the line.
-        ///     This signifies the line represents the start of a new script within the file.
-        /// </summary>
-        private static readonly Regex headingRegex = new(@"^#{1,6}\s+(.*?)(?=%%|$)", RegexOptions.Compiled);
-
-        /// <summary>
-        ///     Matches one or more Unicode uppercase characters, hyphens and underscores at the start of the line.
-        ///     This signifies the line represents a character.
-        /// </summary>
-        private static readonly Regex characterRegex = new(@"^[\p{Lu}-_]+(?=\s|$)", RegexOptions.Compiled);
-
-        /// <summary>
-        ///     Matches a link in the form <c>[[Some test]]</c> that either exists on its own line or ends with an Obsidian comment.
-        /// </summary>
-        private static readonly Regex linkRegex = new(@"^\[\[(.+)\]\](?=\s*%%|$)", RegexOptions.Compiled);
-
-        [field: SerializeField] public string ScriptName { get; set; } = DEFAULT_SCRIPT_NAME;
         [field: SerializeField] public List<MarkDialogueScriptLine> Lines { get; set; } = new();
+        [field: SerializeField] public int StartLine { get; set; } = 0;
+        [field: SerializeField] public int EndLine { get; set; } = 0;
 
         /// <summary>
         ///     Parses the supplied pre-split script lines starting from <paramref name="lineNumber"/>. Returns the last line we get to before ending, which is either
@@ -43,19 +27,24 @@ namespace NovaDawnStudios.MarkDialogue.Data
         /// <returns>The last line that we parsed to - either the end of the file, or the heading that starts a new script.</returns>
         public int Parse(string[] splScript, int lineNumber)
         {
+            StartLine = EndLine = lineNumber;
+
             // Check if we have a section name
             string line = splScript[lineNumber].Trim();
-            var match = headingRegex.Match(line);
+            var match = MarkDialogueRegexCollection.headingRegex.Match(line);
             if (match.Success)
             {
-                ScriptName = match.Groups[1].Value;
+                name = match.Groups[1].Value;
                 ++lineNumber;
             }
-
-            this.name = ScriptName;
+            else
+            {
+                name = DEFAULT_SCRIPT_NAME;
+            }
 
             for (; lineNumber < splScript.Length; ++lineNumber)
             {
+                EndLine = lineNumber;
                 line = splScript[lineNumber].Trim();
 
                 if (line.Length == 0)
@@ -63,17 +52,18 @@ namespace NovaDawnStudios.MarkDialogue.Data
                     continue;
                 }
 
-                if (headingRegex.IsMatch(line)) // We've hit a new heading. Bounce out and let the next MarkDialogueScript handle it.
+                if (MarkDialogueRegexCollection.headingRegex.IsMatch(line)) // We've hit a new heading. Bounce out and let the next MarkDialogueScript handle it.
                 {
                     break;
                 }
 
-                if (linkRegex.IsMatch(line))
+                if (MarkDialogueRegexCollection.linkRegex.IsMatch(line))
                 {
                     Lines.Add(new MarkDialogueScriptLine
                     {
                         type = MarkDialogueScriptLineType.Link,
                         rawLine = line,
+                        lineNumber = lineNumber,
                     });
                     continue;
                 }
@@ -84,6 +74,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
                     {
                         type = MarkDialogueScriptLineType.Tag,
                         rawLine = line,
+                        lineNumber = lineNumber,
                     });
                     continue;
                 }
@@ -94,17 +85,19 @@ namespace NovaDawnStudios.MarkDialogue.Data
                     {
                         type = MarkDialogueScriptLineType.Quote,
                         rawLine = line,
+                        lineNumber = lineNumber,
                     });
                     continue;
                 }
                 
-                match = characterRegex.Match(line);
+                match = MarkDialogueRegexCollection.characterRegex.Match(line);
                 if (match.Success)
                 {
                     Lines.Add(new MarkDialogueScriptLine
                     {
                         type = MarkDialogueScriptLineType.Character,
                         rawLine = line,
+                        lineNumber = lineNumber,
                     });
                     continue;
                 }
@@ -114,28 +107,11 @@ namespace NovaDawnStudios.MarkDialogue.Data
                 {
                     type = MarkDialogueScriptLineType.Dialogue,
                     rawLine = line,
+                    lineNumber = lineNumber,
                 });
             }
 
             return lineNumber;
         }
-    }
-
-    [Serializable]
-    public enum MarkDialogueScriptLineType
-    {
-        Unknown = 0,
-        Character = 1,
-        Dialogue = 2,
-        Link = 3,
-        Quote = 4,
-        Tag = 5,
-    }
-
-    [Serializable]
-    public class MarkDialogueScriptLine
-    {
-        public MarkDialogueScriptLineType type = MarkDialogueScriptLineType.Unknown;
-        public string rawLine = "";
     }
 }

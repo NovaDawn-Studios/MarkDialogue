@@ -1,7 +1,6 @@
 #nullable enable
 
 using NovaDawnStudios.MarkDialogue.Data;
-using System.IO;
 using UnityEditor.AssetImporters;
 
 namespace NovaDawnStudios.MarkDialogue.Editor
@@ -11,13 +10,13 @@ namespace NovaDawnStudios.MarkDialogue.Editor
     {
         public override void OnImportAsset(AssetImportContext ctx)
         {
-            var collection = MarkDialogueScriptCollection.ParseScript(File.ReadAllText(ctx.assetPath));
+            var collection = MarkDialogueScriptCollection.ParseScript(ctx.assetPath);
             ctx.AddObjectToAsset("scriptcollection", collection);
             ctx.SetMainObject(collection);
 
             foreach (var script in collection.Scripts)
             {
-                ctx.AddObjectToAsset($"script_{script.ScriptName}", script);
+                ctx.AddObjectToAsset($"script_{script.name}", script);
             }
         }
     }

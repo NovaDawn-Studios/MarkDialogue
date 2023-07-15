@@ -1,0 +1,29 @@
+{
+    "name": "uk.co.novadawnstudios.markdialogue",
+    "displayName": "MarkDialogue",
+    "description": "MarkDialogue is a semi-opinionated MarkDown to Dialogue system converter, utilizing Obsidian.md's dialect of MarkDown.\n\nSimply create files ending in '.dlg.md', write in MarkDown in a screenplay-like syntax and MarkDialogue will convert it to Unity objects that correctly handle things like character selection, branching logic and jumping to other scripts without the hassle.\n\nThen, either using the built-in types or your own custom playback component, play this dialogue back in a natural fashion. Add your own additional logic as required to handle requirements for your specific project.",
+    "author": {
+        "name": "NovaDawn Studios",
+        "url": "https://novadawnstudios.co.uk/"
+    },
+    "version": "0.0.1-alpha",
+    "unity": "2022.3",
+    "keywords": [
+        "Plugin",
+        "Dialogue",
+        "Dialog",
+        "MarkDown"
+    ],
+    "homepage": "https://github.com/NovaDawn-Studios/MarkDialogue",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/NovaDawn-Studios/MarkDialogue.git"
+    },
+    "samples": [
+        {
+            "displayName": "Basic",
+            "description": "This sample contains a basic example dialogue script in MarkDown that will be imported by MarkDialogue.",
+            "path": "Samples~/Basic"
+        }
+    ]
+}

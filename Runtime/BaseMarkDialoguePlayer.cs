@@ -2,7 +2,10 @@
 
 using NovaDawnStudios.MarkDialogue.Data;
 using NovaDawnStudios.MarkDialogue.Exceptions;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -12,7 +15,6 @@ namespace NovaDawnStudios.MarkDialogue
     ///     Provides the core functionality for running a MarkDialogue script. 
     ///     Inherit from this class to provide your own implementation as require by your project. 
     /// </summary>
-    [IncludeInSettings(true)]
     public abstract class BaseMarkDialoguePlayer : MonoBehaviour
     {
         /// <summary>The script collection containing the MarkDialogue script we want to run.</summary>
@@ -78,8 +80,37 @@ namespace NovaDawnStudios.MarkDialogue
                 CurrentScriptLineNumber = script.StartLine,
             };
 
-            for(; state.CurrentScriptLineNumber < state.Script.Lines.Count; ++state.CurrentScriptLineNumber)
+            OnDialogueStart(state);
+
+            for(; state.CurrentScriptLineNumber <= state.Script.Lines.Count; ++state.CurrentScriptLineNumber)
             {
+                if (state.CurrentScriptLineNumber == state.Script.Lines.Count)
+                {
+                    if (state.Choices.Count == 0)
+                    {
+                        // Nowhere to go. Dialogue ends.
+                        break;
+                    }
+
+                    var selectedChoice = state.Choices[0];
+                    if (state.Choices.Count > 1)
+                    {
+                        var continuation = new WaitForChoicesContinuation(state.Choices);
+                        OnDialogueChoices(continuation);
+                        yield return continuation;
+                        selectedChoice = continuation.SelectedChoice;
+
+                        if (selectedChoice == null)
+                        {
+                            throw new InvalidOperationException($"Expected {nameof(WaitForChoicesContinuation)} to return a choice, but got null instead!");
+                        }
+                    }
+
+                    // TODO: Parse selectedChoice
+                    Debug.Log($"TODO: Jump to {selectedChoice.TargetScript} (Display name: {selectedChoice.DisplayName}");
+                    break;
+                }
+
                 var scriptLine = state.Script.Lines[state.CurrentScriptLineNumber];
 
                 switch (scriptLine.type)
@@ -101,8 +132,8 @@ namespace NovaDawnStudios.MarkDialogue
                         break;
 
                     case MarkDialogueScriptLineType.Link:
-                        // TODO: Collect
-                        Debug.Log($"[{scriptLine.lineNumber}] => Link '{scriptLine.rawLine}'.");
+                        var link = MarkDialogueLink.FromScriptLine(scriptLine);
+                        state.Choices.Add(link);
                         break;
 
                     case MarkDialogueScriptLineType.Quote:
@@ -113,12 +144,59 @@ namespace NovaDawnStudios.MarkDialogue
 
                     case MarkDialogueScriptLineType.Tag:
                         var tagFunc = MarkDialogueTagInstruction.FromScriptLine(scriptLine);
-                        // TODO: Dispatch
-                        Debug.Log($"[{scriptLine.lineNumber}] => Logic '{tagFunc.Tag}' with command '{tagFunc.Command}'.");
+                        EvaluateTagFunc(tagFunc, state);
                         break;
                 }
 
                 yield return null;
+            }
+
+            OnDialogueEnd();
+        }
+
+        private void EvaluateTagFunc(MarkDialogueTagInstruction tagFunc, MarkDialoguePlayerState state)
+        {
+            int scriptLineNumber = state.CurrentScriptLineNumber;
+            Debug.Log($"[{scriptLineNumber}] => Logic '{tagFunc.Tag}' with command '{tagFunc.Args}'.");
+
+            // TODO: Handle builtins using database class.
+            if (tagFunc.Tag == "if" || tagFunc.Tag == "elseif")
+            {
+                // TODO: Parse functions
+                if (UnityEngine.Random.value < 0.5)
+                {
+                    // Continue as is
+                    return;
+                }
+                else
+                {
+                    var ifEndTags = new[] { "else", "elseif", "endif" };
+                    var ifStartScopeTags = new[] { "if" };
+                    var ifEndScopeTags = new[] { "endif" };
+                    var newTag = state.SkipToNextTag(ifEndTags, ifStartScopeTags, ifEndScopeTags);
+
+                    if (newTag == null)
+                    {
+                        Debug.LogWarning($"Unterminated '{tagFunc.Tag}' tag on line {scriptLineNumber}. Did you forget an #endif?");
+                    }
+                    if (newTag != null && newTag.Equals("elseif", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Backup one line so this gets re-evaluated next line.
+                        --state.CurrentScriptLineNumber;
+                    }
+                }
+            }
+            else if (tagFunc.Tag == "else")
+            {
+                var ifEndTags = new[] { "endif" };
+                var ifStartScopeTags = new[] { "if" };
+                var ifEndScopeTags = new[] { "endif" };
+                var newTag = state.SkipToNextTag(ifEndTags, ifStartScopeTags, ifEndScopeTags);
+
+                if (newTag == null)
+                {
+                    Debug.LogWarning($"Unterminated '{tagFunc.Tag}' tag on line {scriptLineNumber}. Did you forget an #endif?");
+                }
             }
         }
 
@@ -129,6 +207,9 @@ namespace NovaDawnStudios.MarkDialogue
         protected abstract void OnDialogueLine(MarkDialogueCharacter character, MarkDialogueLine dialogueLine, WaitForDialogueContinuation continuation);
 
         protected abstract void OnQuoteText(MarkDialogueLine quoteLine);
+
+        protected abstract void OnDialogueChoices(WaitForChoicesContinuation continuation);
+
     }
 
     public class MarkDialoguePlayerState
@@ -137,5 +218,43 @@ namespace NovaDawnStudios.MarkDialogue
         public MarkDialogueScript? Script { get; set; }
         public int CurrentScriptLineNumber { get; set; }
         public MarkDialogueCharacter? CurrentCharacter { get; set; }
+        public List<MarkDialogueLink> Choices { get; set; } = new List<MarkDialogueLink>();
+
+        public string? SkipToNextTag(string[] targetTags, string[]? scopeStartTags = null, string[]? scopeEndTags = null)
+        {
+            if (Script == null)
+            {
+                throw new InvalidOperationException($"{nameof(Script)} cannot be null.");
+            }
+
+            int scopeLevel = 0;
+            while (++CurrentScriptLineNumber < Script.Lines.Count)
+            {
+                var match = MarkDialogueRegexCollection.tagRegex.Match(Script.Lines[CurrentScriptLineNumber].rawLine);
+                if (!match.Success)
+                {
+                    continue;
+                }
+
+                var tag = match.Groups["tag"].Value;
+
+                if (scopeLevel == 0 && Array.Exists(targetTags, s => s.Equals(tag, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return tag;
+                }
+
+                if (scopeStartTags != null && Array.Exists(scopeStartTags, s => s.Equals(tag, StringComparison.OrdinalIgnoreCase)))
+                {
+                    ++scopeLevel;
+                }
+
+                if (scopeEndTags != null && Array.Exists(scopeEndTags, s => s.Equals(tag, StringComparison.OrdinalIgnoreCase)))
+                {
+                    --scopeLevel;
+                }
+            }
+
+            return null;
+        }
     }
 }

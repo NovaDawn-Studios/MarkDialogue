@@ -5,7 +5,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
     /// <summary>
     ///     Represents a single contiguous MarkDialogue script.
     /// </summary>
-    public sealed class MarkDialogueRegexCollection
+    public static class MarkDialogueRegexCollection
     {
         /// <summary>
         ///     Matches an Obsidian comment in the form <c>%% some txt %%</c>. These comments are removed from the script before parsing.
@@ -27,11 +27,13 @@ namespace NovaDawnStudios.MarkDialogue.Data
         /// <summary>
         ///     Matches a link in the form <c>[[Some test]]</c> that either exists on its own line or ends with an Obsidian comment.
         /// </summary>
-        public static readonly Regex linkRegex = new(@"^\[\[(.+)\]\](?=\s*%%|$)", RegexOptions.Compiled);
+        public static readonly Regex linkRegex = new(@"^\[\[(?<target>.*?)(?:\|(?<display>.*))?\]\]$", RegexOptions.Compiled);
 
         /// <summary>
         ///     Matches a logic tag in the form <c>#TagName {Optional Arguments}</c>.
         /// </summary>
-        public static readonly Regex tagRegex = new(@"^#(\w+)(?:\s(.*))?$", RegexOptions.Compiled);
+        public static readonly Regex tagRegex = new(@"^#(?<tag>\w+)(?:\s(?<args>.*))?$", RegexOptions.Compiled);
+
+        public static readonly Regex textRegex = new(@"(\w+)\((?<args>.*?)\)", RegexOptions.Compiled);
     }
 }

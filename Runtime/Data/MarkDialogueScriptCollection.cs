@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace NovaDawnStudios.MarkDialogue.Data
@@ -72,7 +71,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
                 var script = ScriptableObject.CreateInstance<MarkDialogueScript>();
                 line = script.Parse(splScript, line);
 
-                if (collection.Scripts.Any(s => s.name.Equals(script.name, StringComparison.OrdinalIgnoreCase)))
+                if (collection.Scripts.Exists(s => s.name.Equals(script.name, StringComparison.OrdinalIgnoreCase)))
                 {
                     throw new DuplicateMarkDialogueScriptException(collection, script);
                 }

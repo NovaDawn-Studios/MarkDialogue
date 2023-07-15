@@ -30,5 +30,11 @@ namespace NovaDawnStudios.MarkDialogue
         {
             Debug.LogWarning($"[Dialogue Comment] {quoteLine}");
         }
+
+        protected override void OnDialogueChoices(WaitForChoicesContinuation continuation)
+        {
+            Debug.LogWarning($"[Dialogue Choice] Picking first choice");
+            continuation.SelectChoice(continuation.PossibleChoices[0]);
+        }
     }
 }

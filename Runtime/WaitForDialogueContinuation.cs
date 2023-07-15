@@ -7,7 +7,7 @@ namespace NovaDawnStudios.MarkDialogue
     /// <summary>
     ///     An yield instruction that holds up a <see cref="BaseMarkDialoguePlayer"/> until continued by the player.
     /// </summary>
-    public class WaitForDialogueContinuation : CustomYieldInstruction
+    public sealed class WaitForDialogueContinuation : CustomYieldInstruction
     {
         private bool _keepWaiting = true;
         public override bool keepWaiting => _keepWaiting;

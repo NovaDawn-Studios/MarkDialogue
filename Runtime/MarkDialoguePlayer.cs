@@ -12,6 +12,7 @@ namespace NovaDawnStudios.MarkDialogue
     {
         protected override void OnDialogueStart(MarkDialoguePlayerState state)
         {
+            state.VariableStore = MarkDialogueVariableStore.CreateInstanceIfRequired();
             Debug.Log("Starting Dialogue");
         }
 

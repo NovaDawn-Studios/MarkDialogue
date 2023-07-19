@@ -4,7 +4,6 @@ using NovaDawnStudios.MarkDialogue.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace NovaDawnStudios.MarkDialogue.Data
@@ -21,6 +20,11 @@ namespace NovaDawnStudios.MarkDialogue.Data
         ///     DEVNOTE: This exists for testing.
         /// </remarks>
         [field: SerializeField, Multiline] public string RawScript { get; set; } = "";
+
+        /// <summary>
+        ///     The file path to this script collection. Used to find other scripts via <c>[[Link]]</c> tags.
+        /// </summary>
+        [field: SerializeField] public string AssetPath { get; set; } = "";
 
         /// <summary>
         ///     The collection of one or more MarkDialogue scripts found within the supplied script file.
@@ -45,7 +49,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
                 scriptName = MarkDialogueScript.DEFAULT_SCRIPT_NAME;
             }
 
-            return Scripts.FirstOrDefault(s => s.name == scriptName);
+            return Scripts.Find(s => s.name == scriptName);
         }
 
         /// <summary>
@@ -56,11 +60,23 @@ namespace NovaDawnStudios.MarkDialogue.Data
         /// <returns>The newly created <see cref="MarkDialogueScriptCollection"/>.</returns>
         public static MarkDialogueScriptCollection ParseScript(string assetPath)
         {
-            var fileName = Path.GetFileNameWithoutExtension(assetPath);
             var rawScript = File.ReadAllText(assetPath);
+            return ParseScript(rawScript, assetPath);
+        }
+
+        /// <summary>
+        ///     Creates a new instance of <see cref="MarkDialogueScriptCollection"/>, then parses the raw script file into one or more 
+        ///     <see cref="MarkDialogueScript"/> instances as stored in <see cref="Scripts"/>.
+        /// </summary>
+        /// <param name="assetPath">The path to the script collection to parse.</param>
+        /// <returns>The newly created <see cref="MarkDialogueScriptCollection"/>.</returns>
+        public static MarkDialogueScriptCollection ParseScript(string rawScript, string assetPath)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(assetPath);
 
             var collection = ScriptableObject.CreateInstance<MarkDialogueScriptCollection>();
             collection.name = fileName;
+            collection.AssetPath = assetPath;
             collection.RawScript = rawScript;
 
             var cleanedScript = MarkDialogueRegexCollection.commentRegex.Replace(rawScript, ""); //Remove comments.
@@ -69,7 +85,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
             while (line < splScript.Length)
             {
                 var script = ScriptableObject.CreateInstance<MarkDialogueScript>();
-                line = script.Parse(splScript, line);
+                line = script.Parse(collection, splScript, line);
 
                 if (collection.Scripts.Exists(s => s.name.Equals(script.name, StringComparison.OrdinalIgnoreCase)))
                 {

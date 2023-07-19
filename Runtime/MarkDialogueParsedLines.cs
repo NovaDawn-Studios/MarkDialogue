@@ -1,7 +1,8 @@
 #nullable enable
 
 using NovaDawnStudios.MarkDialogue.Data;
-using Unity.VisualScripting.YamlDotNet.Serialization;
+using System;
+using System.Linq;
 
 namespace NovaDawnStudios.MarkDialogue
 {
@@ -21,13 +22,19 @@ namespace NovaDawnStudios.MarkDialogue
     {
         public string CharacterIdentifier { get; set; } = "<UNKNOWN>";
         public string Alias { get; set; } = "";
+        public string[] Attributes { get; set; } = Array.Empty<string>();
 
         public static MarkDialogueCharacter FromScriptLine(MarkDialogueScriptLine line)
         {
             var character = new MarkDialogueCharacter();
 
             var match = MarkDialogueRegexCollection.characterRegex.Match(line.rawLine);
-            character.CharacterIdentifier = match.Groups[1].Value;
+            character.CharacterIdentifier = match.Groups["ident"].Value;
+            character.Alias = match.Groups["alias"].Value;
+            character.Attributes = match.Groups["attribs"].Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim())
+                .ToArray();
 
             return character;
         }

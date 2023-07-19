@@ -22,7 +22,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
         ///     Matches one or more Unicode uppercase characters, hyphens and underscores at the start of the line.
         ///     This signifies the line represents a character.
         /// </summary>
-        public static readonly Regex characterRegex = new(@"^([\p{Lu}-_]+)(?=\s|$)", RegexOptions.Compiled);
+        public static readonly Regex characterRegex = new(@"^(?<ident>[\p{Lu}\-_]+)(?:\sas\s(?<alias>.*?))?\s*(?:-(?<attribs>.*))?$", RegexOptions.Compiled);
 
         /// <summary>
         ///     Matches a link in the form <c>[[Some test]]</c> that either exists on its own line or ends with an Obsidian comment.

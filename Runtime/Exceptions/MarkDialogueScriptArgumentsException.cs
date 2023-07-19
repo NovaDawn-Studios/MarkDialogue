@@ -4,11 +4,11 @@ using System;
 
 namespace NovaDawnStudios.MarkDialogue.Exceptions
 {
-    public class MarkDialogueInlineScriptException : Exception
+    public class MarkDialogueScriptArgumentsException : Exception
     {
         public MarkDialoguePlayerState PlayerState { get; }
 
-        public MarkDialogueInlineScriptException(MarkDialoguePlayerState state, string message)
+        public MarkDialogueScriptArgumentsException(MarkDialoguePlayerState state, string message)
             : base(state.CreateLoggingString(message))
         {
             PlayerState = state;

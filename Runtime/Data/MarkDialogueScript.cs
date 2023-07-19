@@ -1,8 +1,6 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace NovaDawnStudios.MarkDialogue.Data
@@ -14,19 +12,43 @@ namespace NovaDawnStudios.MarkDialogue.Data
     {
         internal const string DEFAULT_SCRIPT_NAME = "Default Script";
 
+        /// <summary>
+        ///     The script collection that owns this script.
+        /// </summary>
+        [field: SerializeField] public MarkDialogueScriptCollection ParentCollection { get; set; } = default!;
+
+        /// <summary>
+        ///     The file path to this script. Used to find other scripts via <c>[[Link]]</c> tags.
+        /// </summary>
+        [field: SerializeField] public string AssetPath { get; set; } = "";
+
+        /// <summary>
+        ///     The collection of lines in this script.
+        /// </summary>
         [field: SerializeField] public List<MarkDialogueScriptLine> Lines { get; set; } = new();
+
+        /// <summary>
+        ///     The starting line in the script collection where this script starts.
+        /// </summary>
         [field: SerializeField] public int StartLine { get; set; } = 0;
+
+        /// <summary>
+        ///     The endling line in the script collection where this script ends.
+        /// </summary>
         [field: SerializeField] public int EndLine { get; set; } = 0;
 
         /// <summary>
         ///     Parses the supplied pre-split script lines starting from <paramref name="lineNumber"/>. Returns the last line we get to before ending, which is either
         ///     the last line in the file, or the heading of the next script in a multi-script file.
         /// </summary>
+        /// <param name="parentCollection">The collection that owns this script.</param>
         /// <param name="splScript">The lines to parse.</param>
         /// <param name="lineNumber">The starting line</param>
         /// <returns>The last line that we parsed to - either the end of the file, or the heading that starts a new script.</returns>
-        public int Parse(string[] splScript, int lineNumber)
+        public int Parse(MarkDialogueScriptCollection parentCollection, string[] splScript, int lineNumber)
         {
+            ParentCollection = parentCollection;
+            AssetPath = parentCollection.AssetPath;
             StartLine = EndLine = lineNumber;
 
             // Check if we have a section name
@@ -35,6 +57,7 @@ namespace NovaDawnStudios.MarkDialogue.Data
             if (match.Success)
             {
                 name = match.Groups[1].Value;
+                AssetPath += $"#{name}";
                 ++lineNumber;
             }
             else

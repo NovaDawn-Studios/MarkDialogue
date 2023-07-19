@@ -10,7 +10,7 @@
  </a>
  <a href="https://github.com/NovaDawn-Studios/MarkDialogue/commits/main">
   <img src="https://img.shields.io/github/last-commit/NovaDawn-Studios/MarkDialogue" alt="Latest Commit" />
- </a>W
+ </a>
 </p>
 
 ----

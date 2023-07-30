@@ -8,12 +8,7 @@ namespace NovaDawnStudios.MarkDialogue.Editor.Tests.LineParsers
         [Test]
         public void BasicParse()
         {
-            var scriptLine = new MarkDialogueScriptLine()
-            {
-                rawLine = "This is some test dialoge",
-            };
-
-            var line = MarkDialogueLine.FromScriptLine(scriptLine);
+            var line = MDDialogueLine.FromScriptLine("This is some test dialoge", 1);
             Assert.AreEqual("This is some test dialoge", line.LineText);
         }
     }

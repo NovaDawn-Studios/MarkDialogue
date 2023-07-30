@@ -73,7 +73,7 @@ End
         [Test]
         public void HandlesIfBranchesCorrectly()
         {
-            var collection = MarkDialogueScriptCollection.ParseScript(SimpleIfBranchTestScript, "dummy/test.dlg.md");
+            var collection = MDScriptCollectionAsset.ParseScript(SimpleIfBranchTestScript, "dummy/test.dlg.md");
             Assert.IsNotNull(collection.Scripts);
             // TODO: Test it actually runs.
         }
@@ -81,7 +81,7 @@ End
         [Test]
         public void HandlesElseBranchesCorrectly()
         {
-            var collection = MarkDialogueScriptCollection.ParseScript(SimpleElseBranchTestScript, "dummy/test.dlg.md");
+            var collection = MDScriptCollectionAsset.ParseScript(SimpleElseBranchTestScript, "dummy/test.dlg.md");
             Assert.IsNotNull(collection.Scripts);
             // TODO: Test it actually runs.
         }
@@ -89,7 +89,7 @@ End
         [Test]
         public void HandlesNestedBranchesCorrectly()
         {
-            var collection = MarkDialogueScriptCollection.ParseScript(NestedBranchingTestScript, "dummy/test.dlg.md");
+            var collection = MDScriptCollectionAsset.ParseScript(NestedBranchingTestScript, "dummy/test.dlg.md");
             Assert.IsNotNull(collection.Scripts);
             // TODO: Test it actually runs.
         }

@@ -7,12 +7,12 @@ namespace NovaDawnStudios.MarkDialogue.Exceptions
 {
     public class MissingMarkDialogueCharacterException : Exception
     {
-        public MarkDialogueScriptCollection ScriptCollection { get; }
-        public MarkDialogueScript Script { get; }
-        public MarkDialogueScriptLine Line { get; }
+        public MDScriptCollectionAsset ScriptCollection { get; }
+        public MDScriptAsset Script { get; }
+        public MDRawScriptLine Line { get; }
 
-        public MissingMarkDialogueCharacterException(MarkDialogueScriptCollection collection, MarkDialogueScript script, MarkDialogueScriptLine line)
-            : base($"Tried to output a dialogue line but no character was set. Error happened at line {line.lineNumber} in script collection {collection.name} - script {script.name}.")
+        public MissingMarkDialogueCharacterException(MDScriptCollectionAsset collection, MDScriptAsset script, MDRawScriptLine line)
+            : base($"Tried to output a dialogue line but no character was set. Error happened at line {line.LineNumber} in script collection {collection.name} - script {script.name}.")
         {
             ScriptCollection = collection;
             Script = script;

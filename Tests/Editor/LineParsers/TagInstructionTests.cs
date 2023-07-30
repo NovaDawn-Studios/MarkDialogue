@@ -8,24 +8,14 @@ namespace NovaDawnStudios.MarkDialogue.Editor.Tests.LineParsers
         [Test]
         public void BasicParse()
         {
-            var scriptLine = new MarkDialogueScriptLine()
-            {
-                rawLine = "#TODO",
-            };
-
-            var line = MarkDialogueTagInstruction.FromScriptLine(scriptLine);
+            var line = MDTagInstruction.FromScriptLine("#TODO", 1);
             Assert.AreEqual("TODO", line.Tag);
         }
 
         [Test]
         public void ParseWithArgs()
         {
-            var scriptLine = new MarkDialogueScriptLine()
-            {
-                rawLine = "#warn Some text",
-            };
-
-            var line = MarkDialogueTagInstruction.FromScriptLine(scriptLine);
+            var line = MDTagInstruction.FromScriptLine("#warn Some text", 1);
             Assert.AreEqual("warn", line.Tag);
             Assert.AreEqual("Some text", line.Args);
         }

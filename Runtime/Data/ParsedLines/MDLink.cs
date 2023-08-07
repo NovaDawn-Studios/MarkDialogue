@@ -19,11 +19,24 @@ namespace NovaDawnStudios.MarkDialogue.Data
             var tagInstruction = new MDLink(rawLine, lineNumber);
 
             var match = MDRegexCollection.linkRegex.Match(rawLine);
-            tagInstruction.TargetScript = match.Groups["target"].Value;
-            tagInstruction.DisplayName = match.Groups["display"].Value;
+            tagInstruction.TargetScript = match.Groups["target"].Value.Trim();
+            if (tagInstruction.TargetScript.Length == 0)
+            {
+                throw new System.InvalidOperationException($"Link target '{rawLine}' on line {lineNumber} contained no text!");
+            }
+
+            tagInstruction.DisplayName = match.Groups["display"].Value.Trim();
+
             if (string.IsNullOrWhiteSpace(tagInstruction.DisplayName))
             {
-                tagInstruction.DisplayName = tagInstruction.TargetScript;
+                var dispName = tagInstruction.TargetScript;
+                if (dispName[0] == '#')
+                {
+                    dispName = dispName.Substring(1);
+                }
+
+                tagInstruction.DisplayName = dispName.Trim();
+                
             }
 
             return tagInstruction;

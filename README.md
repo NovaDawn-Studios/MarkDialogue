@@ -103,7 +103,7 @@ if that suits your style.
 
 ## Installing MarkDialogue
 
-To install Dialogue Graph in your project, you will need to use the Unity Package Manager. At some point in the future, a dedicated Unity Store package may be available for a small fee to simplify the process (And help fund us in the process).
+To install MarkDialogue in your project, you will need to use the Unity Package Manager. At some point in the future, a dedicated Unity Store package may be available for a small fee to simplify the process (And help fund us in the process).
 
 To open the Unity Package Manager, in Unity, first go to Window -> Package Manager, then click the small + icon at the top left of the window that pops up and click 'Install package from git URL...'. In the window that pops up, paste in https://github.com/NovaDawn-Studios/MarkDialogue.git and you should be good to go.
 
